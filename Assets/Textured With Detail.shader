@@ -11,6 +11,7 @@ Shader "Custom/Textured With Detail"
 	Properties {
 	_Tint ("Tint", Color) = (1, 1, 1, 1)
 	_MainTex("Texture",2D)="white"{}
+	_DetailTex("Detail Texture",2D)="gray"{}
 	}
 	SubShader{
 		Pass{
@@ -18,9 +19,10 @@ Shader "Custom/Textured With Detail"
 		#pragma vertex MyVertexProgram
 		#pragma fragment MyFragmentProgram
 		#include "UnityCG.cginc"
+
 		float4 _Tint;
-		sampler2D _MainTex;
-		float4 _MainTex_ST;
+		sampler2D _MainTex,_DetailTex;
+		float4 _MainTex_ST,_DetailTex_ST;
 
 		struct Interpolators {
 		float4 position:SV_POSITION;
@@ -41,7 +43,8 @@ Shader "Custom/Textured With Detail"
 		}
 		float4 MyFragmentProgram(Interpolators i):SV_TARGET
 		{
-		float4 color=tex2D(_MainTex,i.uv*10)*_Tint;
+		float4 color=tex2D(_MainTex,i.uv)*_Tint;
+		color*=tex2D(_MainTex,i.uv*10)*2;
 		return color;
 		//return float4(i.uv,1,1);
 		//return float4(i.localPosition+0.5,1);////Because negative colors get clamped to zero, our sphere ends up rather dark. As the default sphere has an object-space radius of ½, the color channels end up somewhere between −½ and ½. We want to move them into the 0–1 range, which we can do by adding ½ to all channels.
